@@ -4,10 +4,11 @@ CRUD API for Place and Amenity objects
 """
 
 from flask import jsonify, abort, request
-from models import storage, storage_t
+from models import storage
 from models.place import Place
 from models.amenity import Amenity
 from api.v1.views import app_views
+from models import storage_t
 
 
 @app_views.route(
@@ -18,7 +19,7 @@ def get_amenities_of_place(place_id):
     if not place:
         abort(404)
     if storage_t == "db":
-        amenities = [amenity.to_dict() for amenity in placeçamenities]
+        amenities = [amenity.to_dict() for amenity in place.amenities]
     else:
         amenities = [
                 storage.get(Amenity, amenity_id).to_dict()
@@ -31,22 +32,23 @@ def get_amenities_of_place(place_id):
         '/places/<place_id>/amenities/<amenity_id>',
         methods=["DELETE"], strict_slashes=False
 )
-def delete_amenity(place_id, amenity_id):
+def delete_amenity_to_place(place_id, amenity_id):
     """Deletes a Amenity object to a Place"""
     place = storage.get(Place, place_id)
-    if not place:
-        abort(404)
     amenity = storage.get(Amenity, amenity_id)
-    if not amenity:
+
+    if not place or not amenity:
         abort(404)
+
     if storage_t == "db":
         if amenity not in place.amenities:
             abort(404)
         place.amenities.remove(amenity)
     else:
-        if amenity_id not in place.amenityçids:
+        if amenity_id not in place.amenity_ids:
             abort(404)
         place.amenity_ids.remove(amenity_id)
+
     place.save()
     return jsonify({}), 200
 
