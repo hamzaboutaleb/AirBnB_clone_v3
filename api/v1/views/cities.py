@@ -71,4 +71,4 @@ def edit_city(city_id):
     if key not in ["id", "created_at", "updated_at"]:
       setattr(city, key, value)
   city.save()
-  return jsonify(city.to_dict()), 201
+  return jsonify(city.to_dict())
